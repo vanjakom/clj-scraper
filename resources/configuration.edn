@@ -1,0 +1,107 @@
+[
+  ; required fields
+  ; :id - short keyword that will be used in logs
+  ; :url - if scraper is creating url dynamically ensure this is set before download
+  ; :keep-for - how long page will be kept in cache, in seconds, day is: 86400
+  ; scraper-fn - f(configuration) -> result
+  ; monitor-fn-seq - seq of f(configuration, result) -> result, monitor fns could add values to result
+  ; view-fn - f(configuration, result) -> {:name String :alarm (:ok or :alarm) :description String}
+
+
+  {
+    :id :vipsistem-gbp
+    :scraper-fn clj-scraper.scrapers.rs.vipsistem/exchange-list
+    :monitor-fn-seq []
+    :view-fn clj-scraper.scrapers.rs.vipsistem/view-currency
+    ; keys required by scraper and monitors
+    :url "http://www.vipsistem.rs/kursna-lista.php"
+    :keep-for 86400
+    :currency :GBP}
+  {
+    :id :vipsistem-eur
+    :scraper-fn clj-scraper.scrapers.rs.vipsistem/exchange-list
+    :monitor-fn-seq []
+    :view-fn clj-scraper.scrapers.rs.vipsistem/view-currency
+    ; keys required by scraper and monitors
+    :url "http://www.vipsistem.rs/kursna-lista.php"
+    :keep-for 86400
+    :currency :EUR}
+
+  {
+    :id :sram-apex-11-42
+    :scraper-fn clj-scraper.scrapers.de.bike-components/details-page
+    :monitor-fn-seq [
+                   clj-scraper.scrapers.de.bike-components/monitor-price
+                   clj-scraper.scrapers.de.bike-components/monitor-availability
+                   ]
+    :view-fn clj-scraper.scrapers.de.bike-components/view-price-availability
+    ; keys required by scraper and monitors
+    :url "https://www.bike-components.de/en/SRAM/PG-1130-11-fach-Kassette-fuer-Apex-1-NX-p49162/black-11-42-o69407889/"
+    :keep-for 86400
+    :wanted-price 54.58}
+  {
+    :id :sram-rival-1
+    :scraper-fn clj-scraper.scrapers.de.bike-components/details-page
+    :monitor-fn-seq [
+                   clj-scraper.scrapers.de.bike-components/monitor-price
+                   clj-scraper.scrapers.de.bike-components/monitor-availability
+                   ]
+    :view-fn clj-scraper.scrapers.de.bike-components/view-price-availability
+    ; keys required by scraper and monitors
+    :url "https://www.bike-components.de/en/SRAM/Rival-1-Type-3-0-Schaltwerk-11-fach-p57697/black-long-o69400081/"
+    :keep-for 86400
+    :wanted-price 75.59}
+  {
+    :id :sram-pc1130-11-chain
+    :scraper-fn clj-scraper.scrapers.de.bike-components/details-page
+    :monitor-fn-seq [
+                   clj-scraper.scrapers.de.bike-components/monitor-price
+                   clj-scraper.scrapers.de.bike-components/monitor-availability
+                   ]
+    :view-fn clj-scraper.scrapers.de.bike-components/view-price-availability
+    ; keys required by scraper and monitors
+    :url "https://www.bike-components.de/en/SRAM/PC-1130-11-speed-Chain-p40215/silver-11-speed-o69606224/"
+    :keep-for 86400
+    :wanted-price 14.24}
+  {
+    :id :wahoo-rpm-cadence
+    :scraper-fn clj-scraper.scrapers.de.bike-components/details-page
+    :monitor-fn-seq [
+                   clj-scraper.scrapers.de.bike-components/monitor-price
+                   clj-scraper.scrapers.de.bike-components/monitor-availability
+                   ]
+    :view-fn clj-scraper.scrapers.de.bike-components/view-price-availability
+    ; keys required by scraper and monitors
+    :url "https://www.bike-components.de/en/Wahoo/RPM-Cadence-Trittfrequenzsensor-p47282/blue-white-universal-o187200001/"
+    :keep-for 86400
+    :wanted-price 33.57}
+  {
+    :id :sram-force1-chainring-38T
+    :scraper-fn clj-scraper.scrapers.de.bike-components/details-page
+    :monitor-fn-seq [
+                   clj-scraper.scrapers.de.bike-components/monitor-price
+                   clj-scraper.scrapers.de.bike-components/monitor-availability
+                   ]
+    :view-fn clj-scraper.scrapers.de.bike-components/view-price-availability
+    ; keys required by scraper and monitors
+    :url "https://www.bike-components.de/en/SRAM/Kettenblatt-X-Sync-fuer-Force-1-Rival-1-CX-1-110-mm-p39312/grey-anodized-38-tooth-o258100265/"
+    :keep-for 86400
+    :wanted-price 54.58}
+  {
+    :id :schwalbe-rocket-ron-28
+    :scraper-fn clj-scraper.scrapers.de.bike-components/details-page
+    :monitor-fn-seq [
+                   clj-scraper.scrapers.de.bike-components/monitor-price
+                   clj-scraper.scrapers.de.bike-components/monitor-availability
+                   ]
+    :view-fn clj-scraper.scrapers.de.bike-components/view-price-availability
+    ; keys required by scraper and monitors
+    :url "https://www.bike-components.de/en/Schwalbe/Rocket-Ron-Evolution-LiteSkin-Cyclocross-28-Folding-Tyre-p41440/"
+    :keep-for 86400
+    :wanted-price 27.69}
+
+
+
+
+
+  ]
