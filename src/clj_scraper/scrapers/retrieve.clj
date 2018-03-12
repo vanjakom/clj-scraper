@@ -1,11 +1,36 @@
-(ns clj-scraper.scrapers.retrieve)
+(ns clj-scraper.scrapers.retrieve
+  (:require [clj-common.http :as http])
+  (:require [clj-common.time :as time])
+  (:require [clj-common.io :as io])
+  (:require [clj-common.base64 :as base64])
+  (:require [clj-common.hash :as hash])
+  (:require [clj-common.json :as json])
+  (:require [clj-common.logging :as logging])
+  (:require [clj-common.cache :as cache])
+  (:require [clj-scraper.env :as env]))
 
-(require '[clj-common.http :as http])
-(require '[clj-common.time :as time])
-(require '[clj-common.io :as io])
-(require '[clj-common.logging :as logging])
 
-(defonce cache (atom {}))
+(defn fs-serialize [entry]
+  (json/serialize
+    (assoc
+      entry
+      :data (base64/bytes->base64 (:data entry)))))
+
+(defn fs-deserialize [bytes]
+  (let [entry (json/deserialize bytes)]
+    (assoc
+      entry
+      :data
+      (base64/base64->bytes (:data entry)))))
+
+;(def cache-fn (cache/create-in-memory-cache))
+(def cache-fn (cache/create-local-fs-cache
+             {
+               :cache-path env/*cache-path*
+               :key-fn hash/string->md5
+               :value-serialize-fn fs-serialize
+               :value-deserialize-fn fs-deserialize}))
+
 
 (defn retrieve
   "Should either retrieve InputStream to page or download it
@@ -15,7 +40,7 @@
   (let [url (:url configuration)
         timestamp (time/timestamp-second)
         keep-for (or (:keep-for configuration) 0)]
-    (let [result-from-cache (get @cache url)]
+    (let [result-from-cache (cache-fn url)]
       (if
         (or
           (nil? result-from-cache)
@@ -24,23 +49,16 @@
           (if (and
                 (= (:status result) 200)
                 (some? (:body result)))
-            (let [result-to-cache (dissoc
-                                    (assoc
-                                      result
-                                      :timestamp
-                                      timestamp
-                                      :body-generate-fn
-                                      (io/cache-input-stream (:body result)))
-                                    :body)]
+            (let [result-to-cache {
+                                    :url url
+                                    :timestamp timestamp
+                                    :data (io/input-stream->bytes (:body result))}]
               (logging/report {
                                 :url url
                                 :timestamp timestamp
                                 :retireve :download-ok})
-              (swap!
-                cache
-                (fn [cache]
-                  (assoc cache url result-to-cache)))
-              ((:body-generate-fn result-to-cache)))
+              (cache-fn url result-to-cache)
+              (io/bytes->input-stream (:data result-to-cache)))
             (do
               (logging/report {
                                 :url url
@@ -52,4 +70,7 @@
                             :url url
                             :timestamp timestamp
                             :retireve :cache})
-          ((:body-generate-fn result-from-cache)))))))
+          (io/bytes->input-stream (:data result-from-cache)))))))
+
+
+
