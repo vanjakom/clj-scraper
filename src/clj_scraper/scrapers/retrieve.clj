@@ -31,6 +31,10 @@
                :value-serialize-fn fs-serialize
                :value-deserialize-fn fs-deserialize}))
 
+(def default-configuration
+  {
+    :keep-for (* 24 60 60)})
+
 
 (defn retrieve
   "Should either retrieve InputStream to page or download it
@@ -44,7 +48,9 @@
       (if
         (or
           (nil? result-from-cache)
-          (> timestamp (+ (get result-from-cache :timestamp 0) keep-for)))
+          (and
+            (not (= keep-for -1))
+            (> timestamp (+ (get result-from-cache :timestamp 0) keep-for))))
         (let [result (http/get-raw-as-stream url)]
           (if (and
                 (= (:status result) 200)
