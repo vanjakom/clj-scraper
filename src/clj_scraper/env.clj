@@ -4,4 +4,4 @@
 
 (def ^:dynamic *cache-path*
   (path/string->path
-    "/Users/vanja/projects/clj-scraper/data/cache"))
+    "/tmp/clj-scraper/cache"))
