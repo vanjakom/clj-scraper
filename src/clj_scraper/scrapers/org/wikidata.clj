@@ -27,4 +27,4 @@
         :url
         (str
          "https://www.wikidata.org/w/api.php?action=wbgetentities&sites="
-         language "wiki&format=json&titles=" (url-encode title)))))))))
+         language "wiki&format=json&normalize=yes&titles=" (url-encode title)))))))))

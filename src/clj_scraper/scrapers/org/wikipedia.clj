@@ -6,9 +6,6 @@
    [clj-common.json :as json]
    [clj-scraper.scrapers.retrieve :as retrieve]))
 
-(def configuration
-  {:keep-for (* 30 24 60 60 1000)})
-
 (defn title-encode
   "To be used when title is passed in url"
   [title]
@@ -17,12 +14,15 @@
    " "
    "_"))
 
+;; alternative
+;; https://sr.wikipedia.org/w/api.php?action=parse&prop=wikitext&formatversion=2&format=json&page=Списак_споменика_културе_у_Златиборском_округу
 (defn title->wikitext
   "Note title needs to be encoded, space -> _"
   [language title]
   (with-open [is (retrieve/retrieve
+                  ;; temorary fix
                   (assoc
-                   configuration
+                   retrieve/*configuration*
                    :url
                    (str "https://" language ".wikipedia.org/wiki/" title "?action=raw")))]
     (doall
@@ -35,12 +35,11 @@
   [language title]
   (with-open [is (retrieve/retrieve
                   (assoc
-                   configuration
+                   retrieve/*configuration*
                    :url
                    (str
                     "https://" language ".wikipedia.org/w/api.php?action=query&prop=pageprops&ppprop=wikibase_item&redirects=1&format=json&utf8=1&titles="
                     (url-encode title))))]
-    (println "metadata for" title)
     (when is
       (let [page (second (first (get-in (json/read-keyworded is) [:query :pages])))]
         {

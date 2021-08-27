@@ -23,12 +23,22 @@
       (base64/base64->bytes (:data entry)))))
 
 ;(def cache-fn (cache/create-in-memory-cache))
-(def cache-fn (cache/create-local-fs-cache
-             {
-               :cache-path env/*cache-path*
-               :key-fn hash/string->md5
-               :value-serialize-fn fs-serialize
-               :value-deserialize-fn fs-deserialize}))
+(def cache-fn
+  (cache/create-local-fs-cache
+   {
+    :cache-path env/*cache-path*
+    :key-fn hash/string->md5
+    :value-serialize-fn fs-serialize
+    :value-deserialize-fn fs-deserialize}))
+
+(defn create-local-fs-cache-fn
+  [path]
+  (cache/create-local-fs-cache
+   {
+    :cache-path path
+    :key-fn hash/string->md5
+    :value-serialize-fn fs-serialize
+    :value-deserialize-fn fs-deserialize}))
 
 ;; deprecated
 (def default-configuration
@@ -41,6 +51,7 @@
 ;; todo
 ;; fix must be added in each scraper to support dynamic configuration
 ;; extract url as only parameter to retrieve and always use dynamic configuration
+;; once more, independently :), came to same conclusion
 
 (defn retrieve
   "Should either retrieve InputStream to page or download it
@@ -69,21 +80,12 @@
                                     :url url
                                     :timestamp timestamp
                                     :data (io/input-stream->bytes (:body result))}]
-               (logging/report {
-                                :url url
-                                :timestamp timestamp
-                                :retireve :download-ok})
+               (println "[retrieve][download][ok]" url)
                (cache-fn url result-to-cache)
                (io/bytes->input-stream (:data result-to-cache)))
              (do
-               (logging/report {
-                                :url url
-                                :timestamp timestamp
-                                :retireve :download-fail})
+               (println "[retrieve][download][fail]" url)
                nil)))
          (do
-           (logging/report {
-                            :url url
-                            :timestamp timestamp
-                            :retireve :cache})
+           (println "[retrieve][cache]" url)
            (io/bytes->input-stream (:data result-from-cache))))))))
