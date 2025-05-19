@@ -5,6 +5,10 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :deploy-repositories [
+                        ["clojars" {
+                                    :url "https://clojars.org/repo"
+                                    :sign-releases false}]]
   :dependencies [
-                  [com.mungolab/clj-common "0.3.2"]
-                  [enlive "1.1.6"]])
+                 [com.mungolab/clj-common "0.3.2"]
+                 [enlive "1.1.6"]])
